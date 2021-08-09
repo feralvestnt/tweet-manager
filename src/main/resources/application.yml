@@ -1,0 +1,3 @@
+app:
+  minimumMumberOfFollowers: 1500
+  hashTagFilter: 10
