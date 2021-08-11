@@ -20,19 +20,14 @@ public class UserService {
     }
 
     public User save(User user) {
-        Optional<User> userFound = userRepository.findById(user.getId());
-        if (userFound.isPresent()) {
-            log.info("User already exists");
-            return userFound.get();
-        } else {
+        if (user.getId() == null) {
             log.info("User does not exists");
             log.info("Saving user...");
             return userRepository.save(user);
+        } else {
+            Optional<User> userFound = userRepository.findById(user.getId());
+            return userFound.get();
         }
     }
 
-    public boolean verifyIfUserExists(Integer userId) {
-        Optional<User> user = userRepository.findById(userId);
-        return user.isPresent();
-    }
 }
