@@ -20,14 +20,14 @@ public class Tweet {
     @Column(name = "ID")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "FK_USER", nullable = false, foreignKey = @ForeignKey(name = "FK_USER_TWEET"))
     private User user;
 
     @Column(name = "TEXT")
     private String texto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "FK_IDIOM", nullable = false, foreignKey = @ForeignKey(name = "FK_IDIOM_TWEET"))
     private Idiom idiom;
 
