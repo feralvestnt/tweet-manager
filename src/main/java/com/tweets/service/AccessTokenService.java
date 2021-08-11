@@ -3,6 +3,7 @@ package com.tweets.service;
 import com.tweets.entities.AccessAuth;
 import com.tweets.repository.AccessAuthRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import twitter4j.Twitter;
@@ -27,6 +28,7 @@ public class AccessTokenService {
 
     private static AccessAuthRepository accessAuthRepository;
 
+    @Autowired
     public AccessTokenService(AccessAuthRepository accessAuthRepository) {
         this.accessAuthRepository = accessAuthRepository;
     }
