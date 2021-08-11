@@ -1,3 +1,7 @@
 app:
   minimumMumberOfFollowers: 1500
   hashTagFilter: 10
+  twitter:
+    apiKey: T9atGNzhwFsyQq6FyivI7dCFF
+    apiSecretKey: xQxp4LMUG6AM7sd8LDCULpP3vNIB3UOSDrNO26NuIoTFfi1Q6h
+    bearerToken: AAAAAAAAAAAAAAAAAAAAAHw2SgEAAAAAS9lLkuUIvk6VIrmumU%2B6eB9vSxA%3DV0ImolxeVXvhy5MwjsDY7osfFDGnGLqNy9pZL7pcNZs9PKMc6N
