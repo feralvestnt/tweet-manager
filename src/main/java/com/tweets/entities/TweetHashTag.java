@@ -1,10 +1,12 @@
 package com.tweets.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Data
+@AllArgsConstructor
 @Entity
 @SequenceGenerator(name="TWEET_HASHTAG_ID_SEQ", sequenceName="TWEET_HASHTAG_ID_SEQ", allocationSize = 1)
 @Table(name = "TWEET_HASHTAG")
