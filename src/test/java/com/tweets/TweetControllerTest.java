@@ -7,12 +7,14 @@ import com.tweets.entities.Idiom;
 import com.tweets.entities.Tweet;
 import com.tweets.entities.User;
 import com.tweets.repository.TweetRepository;
+import com.tweets.service.TwitterPublisherService;
 import com.tweets.util.JacksonConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,8 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,6 +40,9 @@ public class TweetControllerTest {
 
     @Autowired
     private TweetRepository tweetRepository;
+
+    @MockBean
+    private TwitterPublisherService twitterPublisherService;
 
     @Test
     public void shouldCreateTweet() throws Exception {
@@ -160,6 +164,23 @@ public class TweetControllerTest {
             .content(jacksonConverter.toJson(tweet))).andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("This tweet was already validated")));
+    }
+
+    @Test
+    public void shouldGetMostUserHashTag() throws Exception {
+        mockMvc.perform(get("/api/tweet/get-most-used-hashtag"))
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$", hasSize(10)))
+                .andExpect(jsonPath("$[0]", is("#brasil")))
+                .andExpect(jsonPath("$[1]", is("#esporte")))
+                .andExpect(jsonPath("$[2]", is("#judo")))
+                .andExpect(jsonPath("$[3]", is("#judoOlimpic")))
+                .andExpect(jsonPath("$[4]", is("#olimp")))
+                .andExpect(jsonPath("$[5]", is("#olimpSoccer")))
+                .andExpect(jsonPath("$[6]", is("#olimpSport")))
+                .andExpect(jsonPath("$[7]", is("#olimpiadas")))
+                .andExpect(jsonPath("$[8]", is("#olympics")))
+                .andExpect(jsonPath("$[9]", is("#style")));
     }
 
     private Idiom getIdiom() {
