@@ -5,6 +5,7 @@ import com.tweets.entities.User;
 import com.tweets.exceptions.ValidationException;
 import com.tweets.repository.TweetRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import twitter4j.Status;
@@ -34,13 +35,16 @@ public class TweetService {
     private static IdiomService idiomService;
     private static UserService userService;
     private static AccessTokenService accessTokenService;
+    private static HashTagService hashTagService;
 
+    @Autowired
     public TweetService(TweetRepository tweetRepository, IdiomService idiomService, UserService userService,
-            AccessTokenService accessTokenService) {
+            AccessTokenService accessTokenService, HashTagService hashTagService) {
         this.tweetRepository = tweetRepository;
         this.idiomService = idiomService;
         this.userService = userService;
         this.accessTokenService = accessTokenService;
+        this.hashTagService = hashTagService;
     }
 
     public void save(Tweet tweet) {
@@ -53,6 +57,7 @@ public class TweetService {
 
             tweetRepository.save(tweet);
 
+            hashTagService.saveHashTag(tweet);
             publishTweet(tweet.getTexto());
         } catch (TwitterException ex) {
             log.error("TwitterException: " + ex.getMessage());
@@ -67,8 +72,8 @@ public class TweetService {
             throw new ValidationException("User not informed");
         }
         if (tweet.getUser().getFollowersCount() <= MINIMUM_NUMBER_OF_FOLLOWERS) {
-            throw new ValidationException("It was impossible to publish this Tweet. The number of followers must be " +
-                    "bigger than " + MINIMUM_NUMBER_OF_FOLLOWERS);
+            throw new ValidationException("It was impossible to publish this Tweet. The number of followers must exceed " +
+                    + MINIMUM_NUMBER_OF_FOLLOWERS);
         }
         if (tweet.getIdiom() == null) {
             throw new ValidationException("Idiom was not informed");
@@ -76,7 +81,7 @@ public class TweetService {
         if (!idiomService.verifyIfIdiomExists(tweet.getIdiom().getId())) {
             throw new ValidationException("Idiom informed was not found");
         }
-        if (tweet.getTexto().isEmpty()) {
+        if (tweet.getTexto() == null || tweet.getTexto().isEmpty()) {
             throw new ValidationException("Text not informed");
         }
         if (tweet.getUser().getLocation() == null || tweet.getUser().getLocation().isEmpty()) {
@@ -131,16 +136,5 @@ public class TweetService {
     public List<Tweet> getAllValidated() {
         List<Tweet> tweets = (List) tweetRepository.findAll();
         return tweets.stream().filter(tweet -> tweet.getValid()).collect(Collectors.toList());
-    }
-
-    public Iterable<Tweet> getByMostUsedHashTag(Integer limit) {
-        /*TODO finalizar
-        encontrar hashtags dentro dos textos e classificar por mais usadas
-        * */
-        List<Tweet> tweets = (List) tweetRepository.findAll();
-        if (limit == null) {
-
-        }
-        return null;
     }
 }

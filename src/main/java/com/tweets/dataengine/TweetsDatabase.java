@@ -54,10 +54,10 @@ public class TweetsDatabase implements CommandLineRunner {
     }
 
     private List<User> createUsers() {
-        User user1 = new UserBuilder().setName("Fernando").setFollowersCount(1900l).setIdStr(9999l)
+        User user1 = new UserBuilder().setName("Fernando").setFollowersCount(1900l)
                 .setLocation("San Francisco, CA").build();
 
-        User user2 = new UserBuilder().setName("Henrique").setFollowersCount(2900l).setIdStr(9999l)
+        User user2 = new UserBuilder().setName("Henrique").setFollowersCount(2900l)
                 .setLocation("San Francisco, CA").build();
 
         userRepository.save(user1);

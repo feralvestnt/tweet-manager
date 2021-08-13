@@ -1,6 +1,7 @@
 package com.tweets.service;
 
 import com.tweets.entities.User;
+import com.tweets.exceptions.ValidationException;
 import com.tweets.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,13 @@ public class UserService {
             return userRepository.save(user);
         } else {
             Optional<User> userFound = userRepository.findById(user.getId());
-            return userFound.get();
+
+            if (userFound.isPresent()) {
+                log.info("User exists");
+                return userFound.get();
+            } else {
+                throw new ValidationException("User does not exist");
+            }
         }
     }
 

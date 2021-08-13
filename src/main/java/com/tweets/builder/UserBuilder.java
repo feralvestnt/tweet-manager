@@ -5,22 +5,16 @@ import com.tweets.entities.User;
 public class UserBuilder {
 
     private Integer id;
-    private Long idStr;
     private String name;
     private String location;
     private Long followersCount;
 
     public User build() {
-        return new User(id, idStr, name, location, followersCount);
+        return new User(id, name, location, followersCount);
     }
 
     public UserBuilder setId(Integer id) {
         this.id = id;
-        return this;
-    }
-
-    public UserBuilder setIdStr(Long idStr) {
-        this.idStr = idStr;
         return this;
     }
 

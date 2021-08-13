@@ -42,17 +42,73 @@ public class TweetControllerTest {
 
     @Test
     public void shouldCreateTweet() throws Exception {
-        Idiom idiom = new IdiomBuilder().setId(1).build();
-        User user = new UserBuilder().setId(1).build();
-
         Tweet tweet = new TweetBuilder().setValid(false).setTexto("Novo twitter texto")
                 .setHashtag(Arrays.asList("#novotweet"))
-                .setUser(user).setIdiom(idiom).build();
+                .setUser(getUser()).setIdiom(getIdiom()).build();
 
         mockMvc.perform(post("/api/tweet/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jacksonConverter.toJson(tweet))).andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldValidateTextTweet() throws Exception {
+        Tweet tweet = new TweetBuilder().setValid(false)
+                .setHashtag(Arrays.asList("#novotweet"))
+                .setUser(getUser()).setIdiom(getIdiom()).build();
+
+        mockMvc.perform(post("/api/tweet/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jacksonConverter.toJson(tweet))).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Text not informed")));
+    }
+
+    @Test
+    public void shouldValidateLocationTweet() throws Exception {
+        User user = getUser();
+        user.setLocation(null);
+        Tweet tweet = new TweetBuilder().setValid(false).setTexto("Novo twitter texto")
+                .setHashtag(Arrays.asList("#novotweet"))
+                .setUser(user).setIdiom(getIdiom()).build();
+
+        mockMvc.perform(post("/api/tweet/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jacksonConverter.toJson(tweet))).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Location not informed")));
+    }
+
+    @Test
+    public void shouldValidateUserWithMoreThan1500Followers() throws Exception {
+        User user = getUser();
+        user.setFollowersCount(1000l);
+        Tweet tweet = new TweetBuilder().setValid(false).setTexto("Novo twitter texto")
+                .setHashtag(Arrays.asList("#novotweet"))
+                .setUser(user).setIdiom(getIdiom()).build();
+
+        mockMvc.perform(post("/api/tweet/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jacksonConverter.toJson(tweet))).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(
+                containsString("It was impossible to publish this Tweet. The number of followers must exceed 1500")));
+    }
+
+    @Test
+    public void shouldValidateExistingIdiom() throws Exception {
+        Idiom idiom = getIdiom();
+        idiom.setId(9999);
+        Tweet tweet = new TweetBuilder().setValid(false).setTexto("Novo twitter texto")
+                .setHashtag(Arrays.asList("#novotweet"))
+                .setUser(getUser()).setIdiom(idiom).build();
+
+        mockMvc.perform(post("/api/tweet/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jacksonConverter.toJson(tweet))).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Idiom informed was not found")));
     }
 
     @Test
@@ -85,7 +141,7 @@ public class TweetControllerTest {
     }
 
     @Test
-    public void shouldReturnNotFound() throws Exception {
+    public void shouldReturnNotFoundWhenTryingToValidate() throws Exception {
         Tweet tweet = new TweetBuilder().setId(999999).build();
 
         mockMvc.perform(put("/api/tweet/validate")
@@ -104,5 +160,14 @@ public class TweetControllerTest {
             .content(jacksonConverter.toJson(tweet))).andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("This tweet was already validated")));
+    }
+
+    private Idiom getIdiom() {
+        return new IdiomBuilder().setId(1).build();
+    }
+
+    private User getUser() {
+        return new UserBuilder().setId(1).setFollowersCount(1501l).setLocation("San Francisco, CA")
+                .setName("Fernando Alves").build();
     }
 }

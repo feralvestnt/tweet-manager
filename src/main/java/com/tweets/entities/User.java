@@ -19,9 +19,6 @@ public class User {
     @Column(name = "ID")
     private Integer id;
 
-    @Column(name = "ID_STR")
-    private Long idStr;
-
     @Column(name = "NAME")
     private String name;
 
