@@ -1,7 +1,9 @@
 package com.tweets.rest;
 
 import com.tweets.entities.Tweet;
+import com.tweets.service.HashTagService;
 import com.tweets.service.TweetService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,14 +13,17 @@ import java.util.List;
 public class TweetController {
 
     private static TweetService tweetService;
+    private static HashTagService hashTagService;
 
-    public TweetController(TweetService tweetService) {
+    @Autowired
+    public TweetController(TweetService tweetService, HashTagService hashTagService) {
         this.tweetService = tweetService;
+        this.hashTagService = hashTagService;
     }
 
     @PostMapping("/create")
     public void create(@RequestBody Tweet tweet) {
-        tweetService.save(tweet);
+        tweetService.create(tweet);
     }
 
     @GetMapping("/get-all")
@@ -37,7 +42,7 @@ public class TweetController {
     }
 
     @GetMapping("/get-most-used-hashtag")
-    public void getMostUsedHashTag() {
-
+    public List<String> getMostUsedHashTag() {
+        return hashTagService.getByMostUsedHashTag();
     }
 }

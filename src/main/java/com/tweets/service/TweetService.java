@@ -8,11 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,42 +20,29 @@ public class TweetService {
     @Value("${app.minimumMumberOfFollowers}")
     private Long MINIMUM_NUMBER_OF_FOLLOWERS;
 
-    @Value("${app.twitter.apiKey}")
-    private String apiKey;
-
-    @Value("${app.twitter.apiSecretKey}")
-    private String apiSecretKey;
-
     private static TweetRepository tweetRepository;
     private static IdiomService idiomService;
     private static UserService userService;
-    private static AccessTokenService accessTokenService;
+    private static TwitterPublisherService twitterPublisherService;
     private static HashTagService hashTagService;
 
     @Autowired
     public TweetService(TweetRepository tweetRepository, IdiomService idiomService, UserService userService,
-            AccessTokenService accessTokenService, HashTagService hashTagService) {
+                        HashTagService hashTagService, TwitterPublisherService twitterPublisherService) {
         this.tweetRepository = tweetRepository;
         this.idiomService = idiomService;
         this.userService = userService;
-        this.accessTokenService = accessTokenService;
         this.hashTagService = hashTagService;
+        this.twitterPublisherService = twitterPublisherService;
     }
 
-    public void save(Tweet tweet) {
+    public void create(Tweet tweet) {
         try {
             validateTweetBeforeCreate(tweet);
 
-            User user = userService.save(tweet.getUser());
+            saveTweet(tweet);
 
-            tweet.setUser(user);
-
-            tweetRepository.save(tweet);
-
-            hashTagService.saveHashTag(tweet);
-            publishTweet(tweet.getTexto());
-        } catch (TwitterException ex) {
-            log.error("TwitterException: " + ex.getMessage());
+            twitterPublisherService.publishTweet(tweet);
         } catch (ValidationException ex) {
             log.error("Exception method save: " + ex.getMessage());
             throw ex;
@@ -92,14 +74,14 @@ public class TweetService {
         }
     }
 
-    private void publishTweet(String text) throws TwitterException {
-        AccessToken accessToken = accessTokenService.loadAccessToken();
-        TwitterFactory factory = new TwitterFactory();
-        Twitter twitter = factory.getInstance();
-        twitter.setOAuthConsumer(apiKey, apiSecretKey);
-        twitter.setOAuthAccessToken(accessToken);
-        Status status = twitter.updateStatus(text);
-        System.out.println("Successfully updated the status to [" + status.getText() + "].");
+    public void saveTweet(Tweet tweet) {
+        User user = userService.save(tweet.getUser());
+
+        tweet.setUser(user);
+
+        tweetRepository.save(tweet);
+
+        hashTagService.saveHashTag(tweet);
     }
 
     public Iterable<Tweet> getAll() {

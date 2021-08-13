@@ -7,8 +7,8 @@ import com.tweets.entities.Idiom;
 import com.tweets.entities.Tweet;
 import com.tweets.entities.User;
 import com.tweets.repository.IdiomRepository;
-import com.tweets.repository.TweetRepository;
 import com.tweets.repository.UserRepository;
+import com.tweets.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -20,13 +20,13 @@ import java.util.List;
 public class TweetsDatabase implements CommandLineRunner {
 
     private static IdiomRepository idiomRepository;
-    private static TweetRepository tweetRepository;
+    private static TweetService tweetService;
     private static UserRepository userRepository;
 
     @Autowired
-    public TweetsDatabase(IdiomRepository idiomRepository, TweetRepository tweetRepository, UserRepository userRepository) {
+    public TweetsDatabase(IdiomRepository idiomRepository, TweetService tweetService, UserRepository userRepository) {
         this.idiomRepository = idiomRepository;
-        this.tweetRepository = tweetRepository;
+        this.tweetService = tweetService;
         this.userRepository = userRepository;
     }
 
@@ -39,15 +39,15 @@ public class TweetsDatabase implements CommandLineRunner {
 
     private void createTweet(List<Idiom> idiomList, List<User> userList) {
         Tweet tweet = new TweetBuilder().setId(null).setTexto("Texto Novo Tweet")
-            .setValid(false).setUser(userList.get(0)).setIdiom(idiomList.get(0)).build();
+            .setValid(false).setUser(userList.get(0)).setIdiom(idiomList.get(0)).setHashtag(getHashTagList()).build();
 
         Tweet tweetValid = new TweetBuilder().setId(null).setTexto("Texto Novo Tweet Validated")
-                .setValid(false).setUser(userList.get(1)).setIdiom(idiomList.get(1)).build();
+                .setValid(true).setUser(userList.get(1)).setIdiom(idiomList.get(1)).setHashtag(getHashTagList()).build();
 
-        tweetRepository.save(tweet);
-        tweetRepository.save(tweetValid);
+        tweetService.saveTweet(tweet);
+        tweetService.saveTweet(tweetValid);
 
-        List<Tweet> tweets = (List) tweetRepository.findAll();
+        List<Tweet> tweets = (List) tweetService.getAll();
 
         tweets.forEach(t -> System.out.println("Tweet Saved " + t.getId() + " - " +
                 " -> " + t.getTexto() + " -> valid " + t.getValid()));
@@ -81,5 +81,24 @@ public class TweetsDatabase implements CommandLineRunner {
         idiomList.forEach(i -> System.out.println("IDIOM SAVED " + i.getId() + " - " + i.getName()));
 
         return idiomList;
+    }
+
+    private List<String> getHashTagList() {
+        return Arrays.asList(
+            "#olimpiadas", "#olimpiadas", "#olimpiadas",
+            "#olympics","#olympics","#olympics",
+            "#brasil", "#brasil", "#brasil",
+            "#esporte", "#esporte", "#esporte",
+            "#tokyo", "#tokyo", "#tokyo",
+            "#olimpSoccer", "#olimpSoccer", "#olimpSoccer",
+            "#judo", "#judo", "#judo",
+            "#styleHealth", "#styleHealth", "#styleHealth",
+            "#olimp", "#olimp", "#olimp",
+            "#judoOlimpic", "#judoOlimpic", "#judoOlimpic",
+            "#style", "#style", "#style",
+            "#olimpSport", "#olimpSport", "#olimpSport",
+            "#judoBrasil",
+            "#styleBrasil"
+        );
     }
 }

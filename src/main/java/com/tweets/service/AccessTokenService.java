@@ -21,10 +21,10 @@ import java.util.List;
 public class AccessTokenService {
 
     @Value("${app.twitter.apiKey}")
-    private String apiKey;
+    private String API_KEY;
 
     @Value("${app.twitter.apiSecretKey}")
-    private String apiSecretKey;
+    private String API_SECRET_KEY;
 
     private static AccessAuthRepository accessAuthRepository;
 
@@ -57,7 +57,7 @@ public class AccessTokenService {
         AccessToken accessToken = null;
         try {
             Twitter twitter = TwitterFactory.getSingleton();
-            twitter.setOAuthConsumer(apiKey, apiSecretKey);
+            twitter.setOAuthConsumer(API_KEY, API_SECRET_KEY);
             RequestToken requestToken = twitter.getOAuthRequestToken();
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
